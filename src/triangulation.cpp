@@ -19,20 +19,41 @@ struct Vertex {
 };
 
 bool is_ear(const std::vector<IntPoint>& polygon, const std::vector<IntPoint>::const_iterator a);
+bool is_ear(const Vertex* a);
+
+// std::vector<Vertex> make_vertices(const std::vector<IntPoint>& polygon) {
+//   std::vector<Vertex> vertices(polygon.size(), Vertex());
+//   vertices.front().previous = &vertices.back();
+//   vertices.back().next = &vertices.front();
+//   for (size_t i=0; i<vertices.size(); ++i) {
+//     vertices[i].point = &polygon[i];
+//     vertices[i].is_ear = is_ear(polygon, polygon.begin() + i);
+//     if (i>0) {
+//       vertices[i].previous = &vertices[i-1];
+//     }
+//     if (i+1<vertices.size()) {
+//       vertices[i].next = &vertices[i+1];
+//     }
+//   }
+//   return vertices;
+// }
 
 std::vector<Vertex> make_vertices(const std::vector<IntPoint>& polygon) {
   std::vector<Vertex> vertices(polygon.size(), Vertex());
   vertices.front().previous = &vertices.back();
-  vertices.back().next = &vertices.front();
-  for (size_t i=0; i<vertices.size(); ++i) {
+  vertices.front().point = &polygon.front();
+  vertices.front().next = &vertices[1];
+  for (size_t i=1; i+1<vertices.size(); ++i) {
+    vertices[i].previous = &vertices[i-1];
     vertices[i].point = &polygon[i];
-    vertices[i].is_ear = is_ear(polygon, polygon.begin() + i);
-    if (i>0) {
-      vertices[i].previous = &vertices[i-1];
-    }
-    if (i+1<vertices.size()) {
-      vertices[i].next = &vertices[i+1];
-    }
+    vertices[i].next = &vertices[i+1];
+  }
+  vertices.back().previous = &vertices.back() - 1;
+  vertices.back().point = &polygon.back();
+  vertices.back().next = &vertices.front();
+
+  for (auto& v: vertices) {
+    v.is_ear = is_ear(&v);
   }
   return vertices;
 }
