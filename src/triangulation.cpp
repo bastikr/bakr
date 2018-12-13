@@ -18,25 +18,7 @@ struct Vertex {
   bool is_ear;
 };
 
-bool is_ear(const std::vector<IntPoint>& polygon, const std::vector<IntPoint>::const_iterator a);
 bool is_ear(const Vertex* a);
-
-// std::vector<Vertex> make_vertices(const std::vector<IntPoint>& polygon) {
-//   std::vector<Vertex> vertices(polygon.size(), Vertex());
-//   vertices.front().previous = &vertices.back();
-//   vertices.back().next = &vertices.front();
-//   for (size_t i=0; i<vertices.size(); ++i) {
-//     vertices[i].point = &polygon[i];
-//     vertices[i].is_ear = is_ear(polygon, polygon.begin() + i);
-//     if (i>0) {
-//       vertices[i].previous = &vertices[i-1];
-//     }
-//     if (i+1<vertices.size()) {
-//       vertices[i].next = &vertices[i+1];
-//     }
-//   }
-//   return vertices;
-// }
 
 std::vector<Vertex> make_vertices(const std::vector<IntPoint>& polygon) {
   std::vector<Vertex> vertices(polygon.size(), Vertex());
@@ -64,7 +46,6 @@ Vertex* remove_vertex(Vertex* vertex) {
   return vertex->next;
 }
 
-// using IntPoint = ClipperLib::IntPoint;
 using Triangle = std::array<const IntPoint*, 3>;
 using TriangleTree = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, Triangle>;
 
@@ -93,9 +74,9 @@ bool is_right(const IntPoint& a, const IntPoint& b, const IntPoint& c) {
 }
 
 bool is_intersecting_properly(const IntPoint& a, const IntPoint& b, const IntPoint& c, const IntPoint& d) {
-  if (is_collinear(a, b, c) || is_collinear(a, b, d) || is_collinear(c, d, a) || is_collinear(c, d, b)) {
-    return false;
-  }
+  // if (is_collinear(a, b, c) || is_collinear(a, b, d) || is_collinear(c, d, a) || is_collinear(c, d, b)) {
+  //   return false;
+  // }
   return (is_left(a, b, c) ^ is_left(a, b, d)) && (is_left(c, d, a) ^ is_left(c, d, b));
 }
 
@@ -117,19 +98,6 @@ bool is_intersecting(const IntPoint& a, const IntPoint& b, const IntPoint& c, co
   return is_between(a, b, c) || is_between(a, b, d) || is_between(c, d, a) || is_between(c, d, b);
 }
 
-bool is_visible(const std::vector<IntPoint>& polygon, const std::vector<IntPoint>::const_iterator a, const std::vector<IntPoint>::const_iterator b) {
-  std::vector<IntPoint>::const_iterator i0 = polygon.end() - 1;
-  std::vector<IntPoint>::const_iterator i1 = polygon.begin();
-  while (i1!=polygon.end()) {
-    if (i0!=a && i0!=b && i1!=a && i1!=b && is_intersecting(*a, *b, *i0, *i1)) {
-      return false;
-    }
-    i0 = i1;
-    i1 += 1;
-  }
-  return true;
-}
-
 bool is_visible(const Vertex* a, const Vertex* b) {
   Vertex* i0 = a->next;
   Vertex* i1 = i0->next;
@@ -143,32 +111,11 @@ bool is_visible(const Vertex* a, const Vertex* b) {
   return true;
 }
 
-
 bool is_in_cone(const IntPoint& a0, const IntPoint& a1, const IntPoint& a2, const IntPoint& b) {
   if (is_left_or_on(a1, a2, a0)) {
     return is_left(a1, b, a0) && is_right(a1, b, a2);
   }
   return !(is_left_or_on(a1, b, a2) && is_left_or_on(b, a1, a0));
-}
-
-std::vector<IntPoint>::const_iterator next_wrapped(const std::vector<IntPoint>& polygon, const std::vector<IntPoint>::const_iterator a) {
-  if (a+1==polygon.end()) {
-    return polygon.begin();
-  }
-  return a + 1;
-}
-
-std::vector<IntPoint>::const_iterator previous_wrapped(const std::vector<IntPoint>& polygon, const std::vector<IntPoint>::const_iterator a) {
-  if (a==polygon.begin()) {
-    return polygon.end() - 1;
-  }
-  return a - 1;
-}
-
-bool is_diagonal(const std::vector<IntPoint>& polygon, const std::vector<IntPoint>::const_iterator a, const std::vector<IntPoint>::const_iterator b) {
-  return is_in_cone(*previous_wrapped(polygon, a), *a, *next_wrapped(polygon, a), *b)
-      && is_in_cone(*previous_wrapped(polygon, b), *b, *next_wrapped(polygon, b), *a)
-      && is_visible(polygon, a, b);
 }
 
 bool is_diagonal(const Vertex* a, const Vertex* b) {
@@ -177,28 +124,8 @@ bool is_diagonal(const Vertex* a, const Vertex* b) {
       && is_visible(a, b);
 }
 
-bool is_ear(const std::vector<IntPoint>& polygon, const std::vector<IntPoint>::const_iterator a) {
-  return is_diagonal(polygon, previous_wrapped(polygon, a), next_wrapped(polygon, a));
-}
-
 bool is_ear(const Vertex* a) {
   return is_diagonal(a->previous, a->next);
-}
-
-// std::vector<IntPoint>::const_iterator select_ear(const std::vector<IntPoint>& polygon, const std::vector<bool>& is_ear, )
-
-size_t wrap_left(size_t i, size_t delta, size_t N) {
-  if (delta<=i) {
-    return i - delta;
-  }
-  return N - delta + i;
-}
-
-size_t wrap_right(size_t i, size_t delta, size_t N) {
-  if (i+delta>=N) {
-    return i + delta - N;
-  }
-  return i + delta;
 }
 
 using HashMap = std::unordered_map<std::pair<const IntPoint*, const IntPoint*>, size_t, boost::hash<std::pair<const IntPoint*, const IntPoint*>>>;
