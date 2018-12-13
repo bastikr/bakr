@@ -74,9 +74,9 @@ bool is_right(const IntPoint& a, const IntPoint& b, const IntPoint& c) {
 }
 
 bool is_intersecting_properly(const IntPoint& a, const IntPoint& b, const IntPoint& c, const IntPoint& d) {
-  // if (is_collinear(a, b, c) || is_collinear(a, b, d) || is_collinear(c, d, a) || is_collinear(c, d, b)) {
-  //   return false;
-  // }
+  if (is_collinear(a, b, c) || is_collinear(a, b, d) || is_collinear(c, d, a) || is_collinear(c, d, b)) {
+    return false;
+  }
   return (is_left(a, b, c) ^ is_left(a, b, d)) && (is_left(c, d, a) ^ is_left(c, d, b));
 }
 
@@ -112,10 +112,7 @@ bool is_visible(const Vertex* a, const Vertex* b) {
 }
 
 bool is_in_cone(const IntPoint& a0, const IntPoint& a1, const IntPoint& a2, const IntPoint& b) {
-  if (is_left_or_on(a1, a2, a0)) {
-    return is_left(a1, b, a0) && is_right(a1, b, a2);
-  }
-  return !(is_left_or_on(a1, b, a2) && is_left_or_on(b, a1, a0));
+  return ((int)is_left(a1, a2, b) + (int)is_left(a1, b, a0) + (int)is_left(a1, a0, a2)) > 1;
 }
 
 bool is_diagonal(const Vertex* a, const Vertex* b) {
