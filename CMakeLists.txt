@@ -26,7 +26,15 @@ add_executable(perf-triangulation
     perf/triangulation.cpp
 )
 
+add_executable(perf-isincone
+    perf/is_in_cone.cpp
+)
+
 target_link_libraries(perf-triangulation
+    benchmark
+)
+
+target_link_libraries(perf-isincone
     benchmark
 )
 
