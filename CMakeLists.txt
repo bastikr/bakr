@@ -22,8 +22,16 @@ add_executable(example-triangulation
     examples/triangulation.cpp
 )
 
+add_executable(perf-triangulation
+    perf/triangulation.cpp
+)
+
+target_link_libraries(perf-triangulation
+    benchmark
+)
+
 target_link_libraries(example-triangulation
-    # wigeon
+    wigeon
 )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
