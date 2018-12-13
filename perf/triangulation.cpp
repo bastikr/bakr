@@ -8,6 +8,7 @@ using namespace bakr;
 void BM_triangulate(benchmark::State& state) {
   int N=state.range(0);
   std::vector<IntPoint> polygon;
+  polygon.reserve(N + 1);
   for (int i=0; i<N; ++i) {
     polygon.push_back(IntPoint{i, 0});
   }
