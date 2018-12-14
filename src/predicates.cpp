@@ -20,6 +20,9 @@ bool is_right(const IntPoint& a, const IntPoint& b, const IntPoint& c) {
   return (b.X - a.X) * (c.Y - a.Y) < (c.X - a.X) * (b.Y - a.Y);
 }
 
+bool is_right_or_on(const IntPoint& a, const IntPoint& b, const IntPoint& c) {
+  return (b.X - a.X) * (c.Y - a.Y) <= (c.X - a.X) * (b.Y - a.Y);
+}
 
 bool is_in_cone(const IntPoint& a0, const IntPoint& a1, const IntPoint& a2, const IntPoint& b) {
   return ((int)is_left(a1, a2, b) + (int)is_left(a1, b, a0) + (int)is_left(a1, a0, a2)) > 1;
