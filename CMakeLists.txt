@@ -18,37 +18,26 @@ include_directories(
 add_library(bakr-triangulation
     src/triangulation.cpp)
 
-add_executable(example-triangulation
-    examples/triangulation.cpp
-)
-
-add_executable(perf-triangulation
-    perf/triangulation.cpp
-)
-
-add_executable(perf-isincone
-    perf/is_in_cone.cpp
-)
-
-target_link_libraries(perf-triangulation
-    benchmark
-)
-
-target_link_libraries(perf-isincone
-    benchmark
-)
-
-target_link_libraries(example-triangulation
-    wigeon
-)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 # Testing
+option(ENABLE_EXAMPLES "Enable examples" ON)
+if (${ENABLE_TESTS})
+    add_subdirectory(examples)
+endif()
+
+# Testing
 option(ENABLE_TESTS "Enable tests" ON)
 if (${ENABLE_TESTS})
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+# Benchmarks
+option(ENABLE_BENCHMARKS "Enable benchmarks" ON)
+if (${ENABLE_TESTS})
+    add_subdirectory(perf)
 endif()

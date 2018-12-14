@@ -21,5 +21,4 @@ void BM_triangulate(benchmark::State& state) {
 
 BENCHMARK(BM_triangulate)->RangeMultiplier(2)->Range(8, 1024);
 
-
 BENCHMARK_MAIN();
