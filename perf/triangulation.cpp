@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include "src/triangulation.cpp"
+#include "bakr.h"
 
 using namespace bakr;
 
@@ -15,7 +15,7 @@ void BM_triangulate(benchmark::State& state) {
   polygon.push_back({50, 20});
 
   for (auto _ : state)
-    triangulate(polygon);
+    triangulation::graph::ear_clipping(polygon);
 }
 
 

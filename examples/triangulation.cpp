@@ -1,4 +1,4 @@
-#include "src/triangulation.cpp"
+#include "bakr.h"
 
 #include "wigeon/wigeon.h"
 #include <fstream>
@@ -14,7 +14,7 @@ int main() {
   // }
   // polygon.push_back({50, 20});
 
-  TriangleTree tree = triangulate(polygon);
+  TriangleTree tree = triangulation::graph::ear_clipping(polygon);
 
   std::ofstream f;
   f.open ("image.svg");

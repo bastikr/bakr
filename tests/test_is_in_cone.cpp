@@ -1,7 +1,7 @@
-#include "src/triangulation.cpp"
+#include "bakr/predicates.h"
 #include "gtest/gtest.h"
 
-using namespace bakr;
+using namespace bakr::predicate;
 
 
 TEST(PREDICATES, IN_CONE) {

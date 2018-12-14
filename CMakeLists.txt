@@ -6,17 +6,17 @@ set (CMAKE_CXX_STANDARD 11)
 # set (CMAKE_CXX_FLAGS "-Wall -Wextra -Wundef -Wcast-align -Wwrite-strings -Wmissing-declarations -Wredundant-decls -Woverloaded-virtual -pthread")
 set (CMAKE_CXX_FLAGS "-Wall -Wextra -Wundef -Wcast-align -Wwrite-strings -Wredundant-decls -Woverloaded-virtual -pthread")
 
-include(CTest)
-enable_testing()
 
 include_directories(
     include
-    .
-    /home/sebastian/catkin_ws/src/wigeon/include
 )
 
 add_library(bakr-triangulation
-    src/triangulation.cpp)
+    src/vertex.cpp
+    src/predicates.cpp
+    src/predicates_vertex.cpp
+    src/triangulation_earclipping.cpp
+)
 
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

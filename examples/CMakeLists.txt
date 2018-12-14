@@ -3,5 +3,6 @@ add_executable(example-triangulation
 )
 
 target_link_libraries(example-triangulation
+    bakr-triangulation
     wigeon
 )
