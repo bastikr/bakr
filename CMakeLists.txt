@@ -25,7 +25,7 @@ include(CPack)
 
 # Testing
 option(ENABLE_EXAMPLES "Enable examples" ON)
-if (${ENABLE_TESTS})
+if (${ENABLE_EXAMPLES})
     add_subdirectory(examples)
 endif()
 
@@ -38,6 +38,6 @@ endif()
 
 # Benchmarks
 option(ENABLE_BENCHMARKS "Enable benchmarks" ON)
-if (${ENABLE_TESTS})
+if (${ENABLE_BENCHMARKS})
     add_subdirectory(perf)
 endif()

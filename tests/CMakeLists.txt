@@ -5,7 +5,8 @@ file(GLOB sources *.cpp)
 add_executable(unittests ${sources})
 
 target_link_libraries (unittests
+    bakr-triangulation
     ${GTEST_BOTH_LIBRARIES}
-    wigeon)
+)
 
 add_test(unit ${PROJECT_BINARY_DIR}/tests/unittests)
