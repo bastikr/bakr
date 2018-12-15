@@ -4,6 +4,18 @@
 using namespace bakr::predicate;
 
 
+TEST(PREDICATES, IS_COLLINEAR) {
+  EXPECT_FALSE(is_collinear({1, -3}, {5, 2}, {1, -2}));
+  EXPECT_FALSE(is_collinear({1, -3}, {5, 2}, {40001, 49998}));
+
+  EXPECT_TRUE(is_collinear({1, -3}, {5, 2}, {1, -3}));
+  EXPECT_TRUE(is_collinear({1, -3}, {5, 2}, {5, 2}));
+  EXPECT_TRUE(is_collinear({1, -3}, {5, 2}, {-3, -8}));
+
+  EXPECT_FALSE(is_collinear({1, -3}, {5, 2}, {1, -4}));
+  EXPECT_FALSE(is_collinear({1, -3}, {5, 2}, {40001, 49996}));
+}
+
 TEST(PREDICATES, IS_LEFT) {
   EXPECT_TRUE(is_left({1, -3}, {5, 2}, {1, -2}));
   EXPECT_TRUE(is_left({1, -3}, {5, 2}, {40001, 49998}));
