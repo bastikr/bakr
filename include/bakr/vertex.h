@@ -3,7 +3,7 @@
 #include <tuple>
 #include <vector>
 
-#include "bakr/typedefs.h"
+#include "bakr/intpoint.h"
 
 
 namespace bakr {

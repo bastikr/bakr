@@ -5,7 +5,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
-#include "bakr/typedefs.h"
+#include "bakr/intpoint.h"
 
 
 namespace bakr {

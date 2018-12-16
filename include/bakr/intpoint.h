@@ -9,4 +9,7 @@ struct IntPoint {
   IntType Y;
 };
 
+bool operator==(const IntPoint&, const IntPoint&);
+bool operator!=(const IntPoint&, const IntPoint&);
+
 } // namespace bakr

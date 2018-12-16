@@ -12,6 +12,7 @@ include_directories(
 )
 
 add_library(bakr-triangulation
+    src/intpoint.cpp
     src/vertex.cpp
     src/predicates.cpp
     src/predicates_vertex.cpp
