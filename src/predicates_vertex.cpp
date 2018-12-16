@@ -26,8 +26,29 @@ bool is_diagonal(const EmptyVertex* a, const EmptyVertex* b) {
       && is_visible(a, b);
 }
 
+// bool is_ear(const EmptyVertex* a) {
+//   return is_diagonal(a->previous, a->next);
+// }
+
+bool is_outside(const IntPoint& p0, const IntPoint& p1, const IntPoint& p2, const IntPoint& a) {
+  return !(is_left_or_on(p0, p1, a) && is_left_or_on(p1, p2, a) && is_left_or_on(p2, p0, a));
+}
+
 bool is_ear(const EmptyVertex* a) {
-  return is_diagonal(a->previous, a->next);
+  if (!is_in_cone(*a->previous->previous->point, *a->previous->point, *a->point, *a->next->point)) {
+    return false;
+  }
+  const IntPoint p0 = *a->previous->point;
+  const IntPoint p1 = *a->point;
+  const IntPoint p2 = *a->next->point;
+  EmptyVertex* v = a->next->next;
+  while (v!=a->previous) {
+    if (!is_outside(p0, p1, p2, *v->point) && &p0!=v->point && &p1!=v->point && &p2!=v->point) {
+      return false;
+    }
+    v = v->next;
+  }
+  return true;
 }
 
 } // namespace predicate
