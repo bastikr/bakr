@@ -10,7 +10,7 @@ namespace predicate {
 bool is_visible(const EmptyVertex* a, const EmptyVertex* b, const EmptyVertex* obstacle) {
   EmptyVertex const* i0 = obstacle;
   EmptyVertex const* i1 = i0->next;
-  while (i1!=a) {
+  while (i1!=obstacle) {
     if (i0!=a && i0!=b && i1!=a && i1!=b && is_intersecting(*a->point, *b->point, *i0->point, *i1->point)) {
       return false;
     }
