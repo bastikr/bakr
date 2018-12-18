@@ -23,6 +23,7 @@ namespace triangulation {
 namespace graph {
 
 TriangleTree ear_clipping(const std::vector<IntPoint>& polygon);
+TriangleTree ear_clipping(const std::vector<const IntPoint*>& polygon);
 
 } // namespace graph
 

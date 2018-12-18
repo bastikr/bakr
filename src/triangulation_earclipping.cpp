@@ -7,6 +7,8 @@
 #include "bakr/predicates_vertex.h"
 
 
+#include <iostream>
+
 namespace bakr {
 
 using HashMap = std::unordered_map<std::pair<const IntPoint*, const IntPoint*>, size_t, boost::hash<std::pair<const IntPoint*, const IntPoint*>>>;
@@ -118,21 +120,26 @@ namespace triangulation {
 
 namespace graph {
 
-TriangleTree ear_clipping(const std::vector<IntPoint>& polygon) {
-  std::vector<EarVertex> vertices = make_vertices<bool>(polygon);
+TriangleTree ear_clipping(std::vector<EarVertex> vertices) {
   for (auto& v: vertices) {
     v.data = predicate::is_ear(v.raw());
+    std::cout << v.data << std::endl;
   }
 
   HashMap open_edges;
 
   EarVertex* current_vertex = &vertices.front();
-  size_t N = polygon.size();
+  size_t N = vertices.size();
   TriangleTree triangle_tree;
   while (N>3) {
     // Find next ear
-    while (!current_vertex->data) {
-      current_vertex = current_vertex->next;
+    if (!current_vertex->data) {
+      EarVertex* v = current_vertex->next;
+      while (!v->data) {
+        assert(v!=current_vertex);
+        v = v->next;
+      }
+      current_vertex = v;
     }
 
     // Add ear to tree
@@ -155,6 +162,14 @@ TriangleTree ear_clipping(const std::vector<IntPoint>& polygon) {
   connect_or_store_edge(triangle[1], triangle[2], tree_vertex, triangle_tree, open_edges);
   connect_or_store_edge(triangle[2], triangle[0], tree_vertex, triangle_tree, open_edges);
   return triangle_tree;
+}
+
+TriangleTree ear_clipping(const std::vector<IntPoint>& polygon) {
+  return ear_clipping(make_vertices<bool>(polygon));
+}
+
+TriangleTree ear_clipping(const std::vector<const IntPoint*>& polygon) {
+  return ear_clipping(make_vertices<bool>(polygon));
 }
 
 } // namespace graph

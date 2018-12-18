@@ -67,7 +67,7 @@ bool is_ear(const EmptyVertex* a) {
   const IntPoint p2 = *a->next->point;
   EmptyVertex* v = a->next->next;
   while (v!=a->previous) {
-    if (!is_outside(p0, p1, p2, *v->point) && &p0!=v->point && &p1!=v->point && &p2!=v->point) {
+    if (!is_outside(p0, p1, p2, *v->point) && a->previous->point!=v->point && a->point!=v->point && a->next->point!=v->point) {
       return false;
     }
     v = v->next;

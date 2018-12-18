@@ -7,12 +7,10 @@
 using namespace bakr;
 
 int main() {
-  std::vector<IntPoint> polygon {{0, 0}, {1, 1}, {4, 5}, {10, 0}, {6, 10}, {0, 5}};
-  // std::vector<IntPoint> polygon;
-  // for (int i=0; i<64000; ++i) {
-  //   polygon.push_back(IntPoint{i, 0});
-  // }
-  // polygon.push_back({50, 20});
+  // std::vector<IntPoint> polygon {{0, 0}, {1, 1}, {4, 5}, {10, 0}, {6, 10}, {0, 5}};
+  std::vector<IntPoint> p0 {{0, 0}, {10, 0}, {5, 10}};
+  std::vector<IntPoint> p1 {{6, 1}, {4, 1}, {5, 3}};
+  std::vector<const IntPoint*> polygon {&p0[0], &p0[1], &p0[2], &p0[0], &p1[0], &p1[1], &p1[2], &p1[0]};
 
   TriangleTree tree = triangulation::graph::ear_clipping(polygon);
 

@@ -27,7 +27,7 @@ int main() {
   for (auto& p: result) {
     wresult.push_back(p->X, p->Y);
   }
-  // TriangleTree tree = triangulation::graph::ear_clipping(collect(result));
+  TriangleTree tree = triangulation::graph::ear_clipping(result);
 
   std::ofstream f;
   f.open ("image.svg");
