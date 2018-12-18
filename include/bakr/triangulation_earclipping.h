@@ -6,6 +6,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "bakr/intpoint.h"
+#include "bakr/vertex.h"
 
 
 namespace bakr {
@@ -15,6 +16,7 @@ using TriangleTree = boost::adjacency_list<boost::vecS, boost::vecS, boost::undi
 
 std::vector<std::array<IntPoint, 3>> triangles(const TriangleTree& tree);
 
+std::vector<const IntPoint*> connect_polygon_with_holes(const std::vector<IntPoint>& polygon, const std::vector<std::vector<IntPoint>>& holes);
 
 namespace triangulation {
 

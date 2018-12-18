@@ -40,38 +40,62 @@ using EarVertex = Vertex<bool>;
 //   return vmax;
 // }
 
-std::vector<EmptyVertex> connect_polygon_with_hole(const std::vector<EmptyVertex>& boundary, const std::vector<EmptyVertex>& hole) {
+std::vector<IntPoint>::const_iterator xmax_vertex(const std::vector<IntPoint>& polygon) {
+  return std::max_element(polygon.begin(), polygon.end(), 
+      [](const IntPoint& p0, const IntPoint& p1) -> bool {return p0.X < p1.X;});
+}
+
+std::vector<IntPoint*>::const_iterator xmax_vertex(const std::vector<IntPoint*>& polygon) {
+  return std::max_element(polygon.begin(), polygon.end(), 
+      [](const IntPoint* p0, const IntPoint* p1) -> bool {return p0->X < p1->X;});
+}
+
+const EmptyVertex* xmax_vertex(const std::vector<EmptyVertex>& vertex_polygon) {
+  return &(*std::max_element(vertex_polygon.begin(), vertex_polygon.end(), 
+      [](const EmptyVertex& v0, const EmptyVertex& v1) -> bool {return v0.point->X < v1.point->X;}));
+}
+
+std::vector<const IntPoint*> connect_polygon_with_hole(const std::vector<const IntPoint*>& boundary, const std::vector<IntPoint>& hole) {
   size_t n = boundary.size() + hole.size() + 2;
-  std::vector<EmptyVertex> result;
+  std::vector<const IntPoint*> result;
   result.reserve(n);
 
-  const EmptyVertex* v_hole = &(*std::max_element(hole.begin(), hole.end(), [](const EmptyVertex* v0, const EmptyVertex* v1) -> bool {return v0->point->X<v1->point->X;}));
-  const EmptyVertex* v_boundary;
+  std::vector<IntPoint>::const_iterator v_hole = xmax_vertex(hole);
+  std::vector<const IntPoint*>::const_iterator v_boundary = boundary.begin();
 
-  for (const auto& v: boundary) {
-    if (v.point->X>v_hole->point->X && predicate::is_visible(&v, &(*v_hole), &v)) {
-      v_boundary = &v;
+  for (; v_boundary!=boundary.end(); ++v_boundary) {
+    if ((*v_boundary)->X > (*v_hole).X && predicate::is_visible(*v_boundary, &(*v_hole), boundary)) {
       break;
     }
   }
-  result.push_back(*v_boundary);
-  for (EmptyVertex* v=v_boundary->next; v!=v_boundary; v=v->next) {
-    result.push_back(*v);
-  }
-  result.push_back(*v_boundary);
-  result.push_back(*v_hole);
-  for (EmptyVertex* v=v_hole->next; v!=v_hole; v=v->next) {
-    result.push_back(*v);
-  }
-  result.push_back(*v_hole);
+  assert(v_boundary!=boundary.end());
+
+  result.insert(result.end(), v_boundary, boundary.end());
+  result.insert(result.end(), boundary.begin(), v_boundary+1);
+
+  std::transform(v_hole, hole.end(), std::back_inserter(result), [](const IntPoint& p) {return &p;});
+  std::transform(hole.begin(), v_hole+1, std::back_inserter(result), [](const IntPoint& p) {return &p;});
   return result;
 }
 
-std::vector<EmptyVertex> connect_polygon_with_holes(const std::vector<IntPoint>& polygon, const std::vector<std::vector<IntPoint>>& holes) {
+using Polygon = std::vector<IntPoint>;
 
-  for (const auto& p: polygon) {
-    
+std::vector<const IntPoint*> connect_polygon_with_holes(const Polygon& polygon, const std::vector<Polygon>& holes) {
+  std::vector<std::pair<IntType, const Polygon*>> holes_sorted;
+  holes_sorted.reserve(holes.size());
+  std::transform(holes.begin(), holes.end(), std::back_inserter(holes_sorted), [](const Polygon& polygon) -> std::pair<IntType, const Polygon*> {return {xmax_vertex(polygon)->X, &polygon};});
+  std::sort(holes_sorted.begin(), holes_sorted.end());
+  std::reverse(holes_sorted.begin(), holes_sorted.end());
+
+
+  std::vector<const IntPoint*> current_polygon;
+  current_polygon.reserve(polygon.size());
+  std::transform(polygon.begin(), polygon.end(), std::back_inserter(current_polygon), [](const IntPoint& p) {return &p;});
+  for (auto& xmax_hole: holes_sorted) {
+    const std::vector<IntPoint>& hole = *std::get<1>(xmax_hole);
+    current_polygon = connect_polygon_with_hole(current_polygon, hole);
   }
+  return current_polygon;
 }
 
 void connect_or_store_edge(const IntPoint* a, const IntPoint* b, size_t tree_vertex, TriangleTree& triangle_tree, HashMap& open_edges) {
