@@ -7,6 +7,17 @@ namespace bakr {
 
 namespace predicate {
 
+bool is_visible(const IntPoint* a, const IntPoint* b, const std::vector<const IntPoint*> obstacle) {
+  const IntPoint* i0 = obstacle.back();
+  for (auto& i1: obstacle) {
+    if (i0!=a && i0!=b && i1!=a && i1!=b && is_intersecting(*a, *b, *i0, *i1)) {
+      return false;
+    }
+    i0 = i1;
+  }
+  return true;
+}
+
 bool is_visible(const EmptyVertex* a, const EmptyVertex* b, const EmptyVertex* obstacle) {
   EmptyVertex const* i0 = obstacle;
   EmptyVertex const* i1 = i0->next;
