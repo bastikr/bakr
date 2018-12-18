@@ -7,6 +7,30 @@ namespace bakr {
 
 namespace predicate {
 
+bool is_visible(const IntPoint* a, const IntPoint* b, const std::vector<const IntPoint*> obstacle) {
+  const IntPoint* i0 = obstacle.back();
+  for (auto& i1: obstacle) {
+    if (i0!=a && i0!=b && i1!=a && i1!=b && is_intersecting(*a, *b, *i0, *i1)) {
+      return false;
+    }
+    i0 = i1;
+  }
+  return true;
+}
+
+bool is_visible(const EmptyVertex* a, const EmptyVertex* b, const EmptyVertex* obstacle) {
+  EmptyVertex const* i0 = obstacle;
+  EmptyVertex const* i1 = i0->next;
+  while (i1!=obstacle) {
+    if (i0!=a && i0!=b && i1!=a && i1!=b && is_intersecting(*a->point, *b->point, *i0->point, *i1->point)) {
+      return false;
+    }
+    i0 = i1;
+    i1 = i1->next;
+  }
+  return true;
+}
+
 bool is_visible(const EmptyVertex* a, const EmptyVertex* b) {
   EmptyVertex* i0 = a->next;
   EmptyVertex* i1 = i0->next;
@@ -43,7 +67,7 @@ bool is_ear(const EmptyVertex* a) {
   const IntPoint p2 = *a->next->point;
   EmptyVertex* v = a->next->next;
   while (v!=a->previous) {
-    if (!is_outside(p0, p1, p2, *v->point) && &p0!=v->point && &p1!=v->point && &p2!=v->point) {
+    if (!is_outside(p0, p1, p2, *v->point) && a->previous->point!=v->point && a->point!=v->point && a->next->point!=v->point) {
       return false;
     }
     v = v->next;
