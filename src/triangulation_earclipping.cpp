@@ -75,15 +75,9 @@ std::vector<const IntPoint*> connect_polygon_with_holes(const Polygon& polygon, 
 }
 
 void connect_or_store_edge(const IntPoint* a, const IntPoint* b, size_t tree_vertex, TriangleTree& triangle_tree, HashMap& open_edges) {
-  std::pair<const IntPoint*, const IntPoint*> edge;
-  if (a>b) {
-    edge = {a, b};
-  } else {
-    edge = {b, a};
-  }
-  auto search_result = open_edges.find(edge);
+  auto search_result = open_edges.find({b, a});
   if (search_result==open_edges.end()) {
-    open_edges.insert({edge, tree_vertex});
+    open_edges.insert({{a, b}, tree_vertex});
   } else {
     boost::add_edge(std::get<1>(*search_result), tree_vertex, triangle_tree);
     open_edges.erase(search_result);
