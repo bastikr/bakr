@@ -41,15 +41,15 @@ int main() {
 
   wigeon::svg::print(f, wresult, properties_path);
 
-  // wigeon::svg::Properties properties_triangle;
-  // properties_triangle
-  //   .add("fill", "none")
-  //   .add("stroke", "#bb3333")
-  //   .add("stroke-width", "0.04");
-  // for (const auto& triangle: triangles(tree)) {
-  //   wigeon::Triangle2D wtriangle({triangle[0].X, triangle[0].Y}, {triangle[1].X, triangle[1].Y}, {triangle[2].X, triangle[2].Y});
-  //   wigeon::svg::print(f, wtriangle, properties_triangle);
-  // }
+  wigeon::svg::Properties properties_triangle;
+  properties_triangle
+    .add("fill", "none")
+    .add("stroke", "#bb3333")
+    .add("stroke-width", "0.02");
+  for (const auto& triangle: triangles(tree)) {
+    wigeon::Triangle2D wtriangle({triangle[0].X, triangle[0].Y}, {triangle[1].X, triangle[1].Y}, {triangle[2].X, triangle[2].Y});
+    wigeon::svg::print(f, wtriangle, properties_triangle);
+  }
 
   wigeon::svg::print_footer(f);
   f.close();

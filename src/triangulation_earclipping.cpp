@@ -7,40 +7,11 @@
 #include "bakr/predicates_vertex.h"
 
 
-#include <iostream>
-
 namespace bakr {
 
 using HashMap = std::unordered_map<std::pair<const IntPoint*, const IntPoint*>, size_t, boost::hash<std::pair<const IntPoint*, const IntPoint*>>>;
 
 using EarVertex = Vertex<bool>;
-
-
-// std::vector<EarVertex> make_vertices(const std::vector<IntPoint>& polygon) {
-//   std::vector<EarVertex> vertices(polygon.size(), EarVertex());
-//   vertices.front().previous = &vertices.back();
-//   vertices.front().point = &polygon.front();
-//   vertices.front().next = &vertices[1];
-//   for (size_t i=1; i+1<vertices.size(); ++i) {
-//     vertices[i].previous = &vertices[i-1];
-//     vertices[i].point = &polygon[i];
-//     vertices[i].next = &vertices[i+1];
-//   }
-//   vertices.back().previous = &vertices.back() - 1;
-//   vertices.back().point = &polygon.back();
-//   vertices.back().next = &vertices.front();
-
-//   for (auto& v: vertices) {
-//     v.data = predicate::is_ear(v.raw());
-//   }
-//   return vertices;
-// }
-
-// std::vector<EmptyVertex>::const_iterator find_xmax(std::vector<EmptyVertex>& vertices) {
-//   std::vector<EmptyVertex>::const_iterator vmax = vertices.begin();
-//   for (; vmax!=vertices.end(); ++vmax) {
-//   return vmax;
-// }
 
 std::vector<IntPoint>::const_iterator xmax_vertex(const std::vector<IntPoint>& polygon) {
   return std::max_element(polygon.begin(), polygon.end(), 
@@ -52,22 +23,25 @@ std::vector<IntPoint*>::const_iterator xmax_vertex(const std::vector<IntPoint*>&
       [](const IntPoint* p0, const IntPoint* p1) -> bool {return p0->X < p1->X;});
 }
 
-const EmptyVertex* xmax_vertex(const std::vector<EmptyVertex>& vertex_polygon) {
-  return &(*std::max_element(vertex_polygon.begin(), vertex_polygon.end(), 
-      [](const EmptyVertex& v0, const EmptyVertex& v1) -> bool {return v0.point->X < v1.point->X;}));
-}
-
 std::vector<const IntPoint*> connect_polygon_with_hole(const std::vector<const IntPoint*>& boundary, const std::vector<IntPoint>& hole) {
   size_t n = boundary.size() + hole.size() + 2;
   std::vector<const IntPoint*> result;
   result.reserve(n);
 
   std::vector<IntPoint>::const_iterator v_hole = xmax_vertex(hole);
+  std::vector<IntPoint>::const_iterator v_hole_next = v_hole+1==hole.end() ? hole.begin() : v_hole+1;
+  std::vector<IntPoint>::const_iterator v_hole_previous = v_hole==hole.begin() ? hole.end()-1 : v_hole-1;
   std::vector<const IntPoint*>::const_iterator v_boundary = boundary.begin();
 
   for (; v_boundary!=boundary.end(); ++v_boundary) {
-    if ((*v_boundary)->X > (*v_hole).X && predicate::is_visible(*v_boundary, &(*v_hole), boundary)) {
-      break;
+    if ((*v_boundary)->X > (*v_hole).X
+        && predicate::is_in_cone(*v_hole_previous, *v_hole, *v_hole_next, **v_boundary)
+        && predicate::is_visible(*v_boundary, &(*v_hole), boundary)) {
+      std::vector<const IntPoint*>::const_iterator v_boundary_next = v_boundary+1==boundary.end() ? boundary.begin() : v_boundary+1;
+      std::vector<const IntPoint*>::const_iterator v_boundary_previous = v_boundary==boundary.begin() ? boundary.end()-1 : v_boundary-1;
+      if (predicate::is_in_cone(**v_boundary_previous, **v_boundary, **v_boundary_next, *v_hole)) {
+        break;
+      }
     }
   }
   assert(v_boundary!=boundary.end());
@@ -123,7 +97,6 @@ namespace graph {
 TriangleTree ear_clipping(std::vector<EarVertex> vertices) {
   for (auto& v: vertices) {
     v.data = predicate::is_ear(v.raw());
-    std::cout << v.data << std::endl;
   }
 
   HashMap open_edges;
