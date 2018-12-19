@@ -9,7 +9,10 @@
 
 namespace bakr {
 
-using HashMap = std::unordered_map<std::pair<const IntPoint*, const IntPoint*>, size_t, boost::hash<std::pair<const IntPoint*, const IntPoint*>>>;
+using HashMap = std::unordered_map<
+  std::pair<const IntPoint*, const IntPoint*>,
+  std::pair<size_t, size_t>,
+  boost::hash<std::pair<const IntPoint*, const IntPoint*>>>;
 
 using EarVertex = Vertex<bool>;
 
@@ -74,14 +77,28 @@ std::vector<const IntPoint*> connect_polygon_with_holes(const Polygon& polygon, 
   return current_polygon;
 }
 
-void connect_or_store_edge(const IntPoint* a, const IntPoint* b, size_t tree_vertex, TriangleTree& triangle_tree, HashMap& open_edges) {
+void connect_or_store_edge(const IntPoint* a, const IntPoint* b, size_t triangle_edge, size_t tree_vertex, TriangleTree& triangle_tree, HashMap& open_edges) {
   auto search_result = open_edges.find({b, a});
   if (search_result==open_edges.end()) {
-    open_edges.insert({{a, b}, tree_vertex});
+    open_edges.insert({{a, b}, {tree_vertex, triangle_edge}});
   } else {
-    boost::add_edge(std::get<1>(*search_result), tree_vertex, triangle_tree);
+    size_t other_triangle_edge, other_tree_vertex;
+    boost::tie(other_tree_vertex, other_triangle_edge) = std::get<1>(*search_result);
+    boost::add_edge(other_tree_vertex, tree_vertex, {other_triangle_edge, triangle_edge}, triangle_tree);
     open_edges.erase(search_result);
   }
+}
+
+void connect_or_store_edges(const Triangle& triangle, size_t tree_vertex, TriangleTree& triangle_tree, HashMap& open_edges) {
+  connect_or_store_edge(triangle[0], triangle[1], 0, tree_vertex, triangle_tree, open_edges);
+  connect_or_store_edge(triangle[1], triangle[2], 1, tree_vertex, triangle_tree, open_edges);
+  connect_or_store_edge(triangle[2], triangle[0], 2, tree_vertex, triangle_tree, open_edges);
+}
+
+void add_triangle(const EarVertex* current_vertex, TriangleTree& triangle_tree, HashMap& open_edges) {
+  Triangle triangle {current_vertex->previous->point, current_vertex->point, current_vertex->next->point};
+  size_t tree_vertex = boost::add_vertex(triangle, triangle_tree);
+  connect_or_store_edges(triangle, tree_vertex, triangle_tree, open_edges);
 }
 
 namespace triangulation {
@@ -110,11 +127,7 @@ TriangleTree ear_clipping(std::vector<EarVertex> vertices) {
     }
 
     // Add ear to tree
-    Triangle triangle {current_vertex->previous->point, current_vertex->point, current_vertex->next->point};
-    size_t tree_vertex = boost::add_vertex(triangle, triangle_tree);
-    connect_or_store_edge(triangle[0], triangle[1], tree_vertex, triangle_tree, open_edges);
-    connect_or_store_edge(triangle[1], triangle[2], tree_vertex, triangle_tree, open_edges);
-    connect_or_store_edge(triangle[2], triangle[0], tree_vertex, triangle_tree, open_edges);
+    add_triangle(current_vertex, triangle_tree, open_edges);
 
     // Remove ear and recalculate possibly changed earness
     N -= 1;
@@ -123,11 +136,9 @@ TriangleTree ear_clipping(std::vector<EarVertex> vertices) {
     current_vertex->next->data = predicate::is_ear(current_vertex->next->raw());
     current_vertex = current_vertex->next;
   }
-  Triangle triangle {current_vertex->previous->point, current_vertex->point, current_vertex->next->point};
-  size_t tree_vertex = boost::add_vertex(triangle, triangle_tree);
-  connect_or_store_edge(triangle[0], triangle[1], tree_vertex, triangle_tree, open_edges);
-  connect_or_store_edge(triangle[1], triangle[2], tree_vertex, triangle_tree, open_edges);
-  connect_or_store_edge(triangle[2], triangle[0], tree_vertex, triangle_tree, open_edges);
+  // Add remaining three points
+  add_triangle(current_vertex, triangle_tree, open_edges);
+
   return triangle_tree;
 }
 

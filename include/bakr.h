@@ -1,4 +1,5 @@
 #include "bakr/intpoint.h"
+#include "bakr/partition.h"
 #include "bakr/vertex.h"
 #include "bakr/transformation.h"
 #include "bakr/construct_geometry.h"
