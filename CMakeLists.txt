@@ -18,6 +18,7 @@ add_library(bakr-triangulation
     src/construct_geometry.cpp
     src/predicates.cpp
     src/predicates_vertex.cpp
+    src/polygon_with_holes.cpp
     src/triangulation_earclipping.cpp
 )
 
